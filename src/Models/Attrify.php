@@ -22,13 +22,6 @@ class Attrify extends Model
         'value' => 'json',
     ];
 
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
     public function modelable()
     {
         return $this->morphTo();
