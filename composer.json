@@ -1,0 +1,24 @@
+{
+    "name": "obelaw/attrify",
+    "autoload": {
+        "psr-4": {
+            "Obelaw\\Attrify\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Karim Mohamed",
+            "email": "komicho1996@gmail.com"
+        }
+    ],
+    "require": {
+        "illuminate/support": "^10.0 || ^11.0 || ^12.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Obelaw\\Attrify\\ObelawAttrifyServiceProvider"
+            ]
+        }
+    }
+}
