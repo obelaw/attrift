@@ -169,4 +169,75 @@ trait HasAttrify
             ->withAggregate(['attrifys as _attrift' . $key => fn($s) => $s->select('value')], 'value')
             ->orderBy('_attrift' . $key, $dir);
     }
+
+    /**
+     * Scope a query to only include models where the JSON attrify value matches.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $q
+     * @param  string  $key
+     * @param  string  $jsonPath
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWhereAttrifyJson($q, $key, $jsonPath, $value)
+    {
+        return $q->whereHas('attrifys', fn($s) => $s->where('key', $key)->where("value->$jsonPath", $value));
+    }
+
+    /**
+     * Scope a query to only include models where the JSON attrify value is like the given pattern.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $q
+     * @param  string  $key
+     * @param  string  $jsonPath
+     * @param  string  $like
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWhereAttrifyJsonLike($q, $key, $jsonPath, $like)
+    {
+        return $q->whereHas('attrifys', fn($s) => $s->where('key', $key)->where("value->$jsonPath", 'like', $like));
+    }
+
+    /**
+     * Scope a query to only include models where a JSON path exists in the attrify value.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $q
+     * @param  string  $key
+     * @param  string  $jsonPath
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWhereAttrifyJsonContains($q, $key, $jsonPath, $value)
+    {
+        return $q->whereHas('attrifys', fn($s) => $s->where('key', $key)->whereJsonContains("value->$jsonPath", $value));
+    }
+
+    /**
+     * Scope a query to only include models where a JSON path has a specific length.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $q
+     * @param  string  $key
+     * @param  string  $jsonPath
+     * @param  int  $length
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWhereAttrifyJsonLength($q, $key, $jsonPath, $length)
+    {
+        return $q->whereHas('attrifys', fn($s) => $s->where('key', $key)->whereJsonLength("value->$jsonPath", $length));
+    }
+
+    /**
+     * Scope a query to order by a JSON value in attrify.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $q
+     * @param  string  $key
+     * @param  string  $jsonPath
+     * @param  string  $dir
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOrderByAttrifyJson($q, $key, $jsonPath, $dir = 'asc')
+    {
+        return $q->whereHas('attrifys', fn($s) => $s->where('key', $key))
+            ->withAggregate(['attrifys as _attrift' . $key . '_' . str_replace('.', '_', $jsonPath) => fn($s) => $s->select("value->$jsonPath")], "value->$jsonPath")
+            ->orderBy('_attrift' . $key . '_' . str_replace('.', '_', $jsonPath), $dir);
+    }
 }
