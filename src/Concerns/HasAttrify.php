@@ -128,4 +128,45 @@ trait HasAttrify
     {
         return $this->morphMany(Attrify::class, 'modelable');
     }
+
+    /**
+     * Scope a query to only include models where the attrify key-value matches.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $q
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWhereAttrify($q, $key, $value)
+    {
+        return $q->whereHas('attrifys', fn($s) => $s->where('key', $key)->where('value', $value));
+    }
+
+    /**
+     * Scope a query to only include models where the attrify key-value is like the given pattern.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $q
+     * @param  string  $key
+     * @param  string  $like
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWhereAttrifyLike($q, $key, $like)
+    {
+        return $q->whereHas('attrifys', fn($s) => $s->where('key', $key)->where('value', 'like', $like));
+    }
+
+    /**
+     * Scope a query to order by an attrify value.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $q
+     * @param  string  $key
+     * @param  string  $dir
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOrderByAttrify($q, $key, $dir = 'asc')
+    {
+        return $q->whereHas('attrifys', fn($s) => $s->where('key', $key))
+            ->withAggregate(['attrifys as _attrift' . $key => fn($s) => $s->select('value')], 'value')
+            ->orderBy('_attrift' . $key, $dir);
+    }
 }
